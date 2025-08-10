@@ -6,6 +6,7 @@ passlib
 bcrypt==3.2.0
 pydantic
 jinja2
+sqlalchemy
 streamlit
 psycopg2-binary
 langchain
