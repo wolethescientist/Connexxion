@@ -313,7 +313,9 @@ async def public_chat_with_bot(
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Error getting chatbot response: {str(e)}")
 
+
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, workers=4, proxy_headers=True, forwarded_allow_ips="*")
+    port = int(os.getenv("PORT", 8000))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, workers=4, proxy_headers=True, forwarded_allow_ips="*")
 
 
