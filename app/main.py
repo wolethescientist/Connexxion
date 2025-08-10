@@ -14,11 +14,23 @@ import schemas
 import security
 from database import engine, get_db
 from chatbot import ChatbotProcessor
+from contextlib import asynccontextmanager
 
-# Create database tables
-models.Base.metadata.create_all(bind=engine)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    try:
+        models.Base.metadata.create_all(bind=engine)
+    except Exception as e:
+        print(f"Startup DB init error: {e}")
+    yield
+    # Shutdown (no-op)
 
-app = FastAPI(title="Connexxion Agent API")
+app = FastAPI(title="Connexxion Agent API", lifespan=lifespan)
+
+@app.get("/")
+async def health():
+    return {"status": "ok"}
 
 # Configure CORS
 app.add_middleware(
@@ -313,8 +325,8 @@ async def public_chat_with_bot(
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Error getting chatbot response: {str(e)}")
 
-
 if __name__ == "__main__":
-    port = int(os.getenv("PORT"))
+    port = int(os.getenv("PORT", "8000"))
     uvicorn.run(app="main:app", host="0.0.0.0", port=port)
+
 
